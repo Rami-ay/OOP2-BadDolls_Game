@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.23)
 
 project (oop2_project)
-set (MY_AUTHORS "Ahmad_Hirbawy-Rami_Ayoub-Masa_AbuDhaim-Yousef_Himouni")
+set (MY_AUTHORS "Rami_Ayoub")
 
 include (cmake/CompilerSettings.cmake)
 
