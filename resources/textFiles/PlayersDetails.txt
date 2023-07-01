@@ -1,4 +1,4 @@
-Name: dfas
+Name: 
 Level: 1
 Score: 0
 Character: Default

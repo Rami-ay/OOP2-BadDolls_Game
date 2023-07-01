@@ -1,6 +1,5 @@
 #pragma once
 #include "StaticObject.h"
-#include "Item.h"
 #include <memory>
 
 class Gift : public StaticObject
@@ -12,6 +11,5 @@ public:
 
 private:
 	//bool m_activated = false;
-	//std::unique_ptr<Item> m_item;
 
 };

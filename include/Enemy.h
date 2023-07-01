@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MovingObject.h"
-#include "Character.h"
 #include "Animation.h"
 #include "Resources.h"
 #include "io.h"

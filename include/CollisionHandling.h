@@ -1,18 +1,24 @@
 #pragma once
-
 #include "GameObject.h"
-
-#include "io.h"
-#include <iostream>
+#include <typeindex>
 #include <typeinfo>
 
-// Sample struct for exception throwing
-struct UnknownCollision : public std::runtime_error
-{
-    UnknownCollision(GameObject& a, GameObject& b)
-        : std::runtime_error(std::string("Unknown collision of ") + typeid(a).name() + " and " + typeid(b).name())
-    {
-    }
-};
 
-void processCollision(GameObject& object1, GameObject& object2);
+
+using CollisionFunc = void (*)(GameObject&, GameObject&);
+using Key = std::pair<std::type_index, std::type_index>;
+using CollisionsTable = std::map<Key, CollisionFunc>;
+
+
+
+class CollisionHandling
+{
+	CollisionHandling() = default;
+	CollisionsTable initializeTable();
+	CollisionFunc search(const std::type_index&, const std::type_index&);
+	
+public:
+
+	static CollisionHandling& instance();
+	void handleCollision(GameObject&, GameObject&);
+};

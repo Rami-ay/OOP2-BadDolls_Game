@@ -5,35 +5,37 @@ namespace
     {
         const auto size = sf::Vector2i(32, 32);
         const auto initSpace = sf::Vector2i(96, 128);
-        const auto middleSpace = sf::Vector2i(0, 0);
         auto firstPlayer = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
 
         firstPlayer.m_data[Direction::Down].emplace_back(currentStart, size);
-        firstPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
-        firstPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            firstPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
+        }
         currentStart.x = 96;
         currentStart.y += size.y;
         firstPlayer.m_data[Direction::Left].emplace_back(currentStart, size);
-        firstPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
-        firstPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            firstPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
+        }
         currentStart.x = 96;
         currentStart.y += size.y;
         firstPlayer.m_data[Direction::Right].emplace_back(currentStart, size);
-        firstPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
-        firstPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            firstPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
+        }
         currentStart.x = 96;
         currentStart.y += size.y;
         firstPlayer.m_data[Direction::Up].emplace_back(currentStart, size);
-        firstPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
-        firstPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            firstPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
+        }
 
 
         return firstPlayer;
@@ -42,94 +44,122 @@ namespace
     {
         const auto size = sf::Vector2i(32, 32);
         const auto initSpace = sf::Vector2i(0, 0);
-        const auto middleSpace = sf::Vector2i(0, 0);
         auto secondPlayer = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
         secondPlayer.m_data[Direction::Down].emplace_back(currentStart, size);
-        secondPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
-        secondPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            secondPlayer.m_data[Direction::Down].emplace_back(nextStart(), size);
+        }
         currentStart.x = 0;
         currentStart.y += size.y;
         secondPlayer.m_data[Direction::Left].emplace_back(currentStart, size);
-        secondPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
-        secondPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            secondPlayer.m_data[Direction::Left].emplace_back(nextStart(), size);
+        }
         currentStart.x = 0;
         currentStart.y += size.y;
         secondPlayer.m_data[Direction::Right].emplace_back(currentStart, size);
-        secondPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
-        secondPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            secondPlayer.m_data[Direction::Right].emplace_back(nextStart(), size);
+        }
         currentStart.x = 96;
         currentStart.y += size.y;
         secondPlayer.m_data[Direction::Up].emplace_back(currentStart, size);
-        secondPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
-        secondPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
+        for (int i = 0; i < 2; ++i) {
+            secondPlayer.m_data[Direction::Up].emplace_back(nextStart(), size);
+        }
 
 
         return secondPlayer;
     }
-    AnimationData EnemyBearData()
+    AnimationData EnemySpiderData()
     {
-        const auto size = sf::Vector2i(32, 32);
-        const auto initSpace = sf::Vector2i(0, 96);
-        const auto middleSpace = sf::Vector2i(0, 0);
-        auto enemyBear = AnimationData{};
+        const auto size = sf::Vector2i(40, 40);
+        const auto initSpace = sf::Vector2i(0, 40);
+        auto enemySpider = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
 
-        enemyBear.m_data[Direction::Right].emplace_back(currentStart, size);
-        for (int i = 0; i < 12; ++i) {
-            enemyBear.m_data[Direction::Right].emplace_back(nextStart(), size);
+        enemySpider.m_data[Direction::Left].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemySpider.m_data[Direction::Left].emplace_back(nextStart(), size);
         }
 
-        currentStart = sf::Vector2i(0, 96);
+        currentStart = sf::Vector2i(0, 80);
 
         // Create left-direction frames as a reflection of the right-direction frames
-        for (const auto& frame : enemyBear.m_data[Direction::Right]) {
-            sf::IntRect flippedFrame(frame.left + frame.width, frame.top, -frame.width, frame.height);
-            enemyBear.m_data[Direction::Left].emplace_back(flippedFrame);
+        enemySpider.m_data[Direction::Right].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemySpider.m_data[Direction::Right].emplace_back(nextStart(), size);
         }
-
-
-        currentStart = sf::Vector2i(0, 96);
-        enemyBear.m_data[Direction::Up].emplace_back(currentStart, size);
-        for (int i = 0; i < 12; ++i) {
-            enemyBear.m_data[Direction::Up].emplace_back(nextStart(), size);
-        }
-
-        currentStart = sf::Vector2i(0, 96);
-        enemyBear.m_data[Direction::Down].emplace_back(currentStart, size);
-        for (int i = 0; i < 12; ++i) {
-            enemyBear.m_data[Direction::Down].emplace_back(nextStart(), size);
-        }
-
-
-        return enemyBear;
+        return enemySpider;
     }
+
+    AnimationData EnemyGhostData()
+    {
+        const auto size = sf::Vector2i(40, 40);
+        const auto initSpace = sf::Vector2i(0, 0);
+        auto enemyGhost = AnimationData{};
+        auto currentStart = initSpace;
+
+        auto nextStart = [&]()
+        {
+            currentStart.x += size.x;
+            return currentStart;
+        };
+
+        enemyGhost.m_data[Direction::Down].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemyGhost.m_data[Direction::Down].emplace_back(nextStart(), size);
+        }
+
+        currentStart = sf::Vector2i(0, 40);
+
+        enemyGhost.m_data[Direction::Left].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemyGhost.m_data[Direction::Left].emplace_back(nextStart(), size);
+        }
+
+        currentStart = sf::Vector2i(0, 80);
+
+        // Create left-direction frames as a reflection of the right-direction frames
+        enemyGhost.m_data[Direction::Right].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemyGhost.m_data[Direction::Right].emplace_back(nextStart(), size);
+        }
+
+        currentStart = sf::Vector2i(0, 120);
+
+        // Create left-direction frames as a reflection of the right-direction frames
+        enemyGhost.m_data[Direction::Up].emplace_back(currentStart, size);
+        for (int i = 0; i < 2; ++i) {
+            enemyGhost.m_data[Direction::Up].emplace_back(nextStart(), size);
+        }
+        return enemyGhost;
+    }
+
+
 
     AnimationData HeartData()
     {
         const auto size = sf::Vector2i(32, 32);
         const auto initSpace = sf::Vector2i(0, 0);
-        const auto middleSpace = sf::Vector2i(0, 0);
         auto heart = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
@@ -144,18 +174,54 @@ namespace
         }
         return heart;
     }
+    AnimationData HealingBallData()
+    {
+        const auto size = sf::Vector2i(40, 35);
+        const auto initSpace = sf::Vector2i(0, 0);
+        auto healingBall = AnimationData{};
+        auto currentStart = initSpace;
+
+        auto nextStart = [&]()
+        {
+            currentStart.x += size.x;
+            return currentStart;
+        };
+        healingBall.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 4; ++i) {
+            healingBall.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 40);
+        healingBall.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 4; ++i) {
+            healingBall.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 80);
+        healingBall.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 4; ++i) {
+            healingBall.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 120);
+        healingBall.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 4; ++i) {
+            healingBall.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 160);
+        healingBall.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 4; ++i) {
+            healingBall.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        return healingBall;
+    }
 
     AnimationData CoinData()
     {
         const auto size = sf::Vector2i(32, 32);
         const auto initSpace = sf::Vector2i(0, 0);
-        const auto middleSpace = sf::Vector2i(0, 0);
         auto coin = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
@@ -170,18 +236,49 @@ namespace
         }
         return coin;
     }
+    AnimationData FireData()
+    {
+        const auto size = sf::Vector2i(40, 25);
+        const auto initSpace = sf::Vector2i(0, 0);
+        auto fire = AnimationData{};
+        auto currentStart = initSpace;
+
+        auto nextStart = [&]()
+        {
+            currentStart.x += size.x;
+            return currentStart;
+        };
+        fire.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 3; ++i) {
+            fire.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 30);
+        fire.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 3; ++i) {
+            fire.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 60);
+        fire.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 3; ++i) {
+            fire.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 90);
+        fire.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 3; ++i) {
+            fire.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        return fire;
+    }
 
     AnimationData BatData()
     {
         const auto size = sf::Vector2i(32, 32);
         const auto initSpace = sf::Vector2i(0, 32);
-        const auto middleSpace = sf::Vector2i(0, 0);
         auto bat = AnimationData{};
         auto currentStart = initSpace;
 
         auto nextStart = [&]()
         {
-            //currentStart += middleSpace;
             currentStart.x += size.x;
             return currentStart;
         };
@@ -195,30 +292,77 @@ namespace
             bat.m_data[Direction::Left].emplace_back(nextStart(), size);
         }
         return bat;
+
+
+    }
+
+    AnimationData fullHeartData()
+    {
+        const auto size = sf::Vector2i(32, 32);
+        const auto initSpace = sf::Vector2i(0, 0);
+        auto fullHeart = AnimationData{};
+        auto currentStart = initSpace;
+
+        auto nextStart = [&]()
+        {
+            currentStart.x += size.x;
+            return currentStart;
+        };
+        fullHeart.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 7; ++i) {
+            fullHeart.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        currentStart = sf::Vector2i(0, 32);
+        fullHeart.m_data[Direction::Stay].emplace_back(currentStart, size);
+        for (int i = 0; i < 7; ++i) {
+            fullHeart.m_data[Direction::Stay].emplace_back(nextStart(), size);
+        }
+        return fullHeart;
     }
 }
-Resources::Resources():m_animationData(Max)
+Resources::Resources():m_animationData(Max), m_levelCoins(0), m_takenCoins(0), m_singlePlayerMode(false)
 {
-    m_levels = readNamesVector("levels.txt"); //read the levels names from the levels file
+    m_singlePlayerLevels = readNamesVector("singleLevels.txt"); //read the levels names from the single player levels file
+    m_multiPlayerLevels = readNamesVector("multiLevels.txt"); //read the levels names from the multiplayer levels file
     std::vector<std::string> texturesNames = readNamesVector("allTextures.txt"); //read the textures names from allTextures file
-   // std::vector<std::string> soundsNames = readNamesVector("allSounds.txt"); //read the sounds names from sounds file
+    std::vector<std::string> soundsNames = readNamesVector("allSounds.txt"); //read the sounds names from sounds file
     m_textures = getTexturesVector(texturesNames); //get the images textures from the images file
-   // m_buffers = fillBufferVector(soundsNames);
-    //m_sounds = fillSoundsVector(m_buffers);
+   m_buffers = fillBufferVector(soundsNames);
+    m_sounds = fillSoundsVector(m_buffers);
+    m_friendlyFire = false;
 
-
-    m_playersNames = readNamesVector("PlayersNames.txt"); //read the players names from PlayersNames file
-   /* if (!m_texture.loadFromFile("Player.png"))
+    try 
     {
-        throw std::runtime_error("Can't load file");
-    }*/
-    m_font.loadFromFile("arial.ttf");
+        m_font.loadFromFile("arial.ttf");
+    }
+    catch (const std::exception& e)
+    {
+        // Handle the specific exception here
+        std::cerr << "Failed to load font: " << e.what() << std::endl;
+    }
+
     m_animationData[FirstPlayer] = FirstPlayerData();
     m_animationData[SecondPlayer] = SecondPlayerData();
-    m_animationData[EnemyBear] = EnemyBearData();
+    m_animationData[EnemySpider] = EnemySpiderData();
+    m_animationData[EnemyGhost] = EnemyGhostData();
     m_animationData[Heart] = HeartData();
     m_animationData[Coin] = CoinData();
     m_animationData[EnemyBat] = BatData();
+    m_animationData[FullHeart] = fullHeartData();
+    m_animationData[Fire] = FireData();
+    m_animationData[HealingBall] =HealingBallData();
+}
+void Resources::playMusic()
+{
+    m_sounds[background].setLoop(true);// play all the time
+    m_sounds[background].setVolume(8);
+    m_sounds[background].play();
+}
+void Resources::playSound(const int index)
+{
+
+    m_sounds[index].setVolume(15);
+    m_sounds[index].play();
 }
 Resources& Resources::instance()
 {
@@ -231,68 +375,20 @@ const std::vector<sf::Texture>& Resources::getTextures() const
 {
     return m_textures;
 }
-//
-////return a specific texture
-//const sf::Texture& Resources::getTexture(const int index) const
-//{
-//    return m_textures[index];
-//}
 
-//return the current level
-int Resources::getCurrentLevel() const
-{
-    std::ifstream file;
-    char level;
-
-    //opens the file
-    file.open("currentLevel.txt");
-    if (!file.is_open()) {
-        std::cerr << "input file not found" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    file.get(level);
-    file.close();
-
-    return level - '0'; //to return the number of the level , for example if the level is 1 (char) then we
-    // decrease the char 0 and we get 1(int)
-}
-
-//const std::vector<sf::Font>& Resources::getFonts() const
-//{
-//    return m_Fonts;
-//}
 const sf::Font& Resources::getFont() const
 {
     return m_font;
 }
 
-const std::string& Resources::getLevel(const int index) const
+const std::string& Resources::getSingleLevel(const int index) const
 {
-    return m_levels[index];
-    
+    return m_singlePlayerLevels[index];
 }
 
-
-const std::vector<std::string> Resources::getPlayers() const
+const std::string& Resources::getMultiLevel(const int index) const
 {
-    return m_playersNames;
-}
-
-//to print the current level number on the currentLevel file
-void Resources::saveCurrentLevel(const int num)
-{
-    std::ofstream file;
-
-    //opens the file
-    file.open("..\\..\\..\\resources\\textFiles\\currentLevel.txt");
-    if (!file.is_open()) {
-        std::cerr << "input file not found" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    file << num;
-    file.close();
+    return m_multiPlayerLevels[index];
 }
 
 //return a vector of strings that read from text
@@ -319,13 +415,26 @@ std::vector<std::string> Resources::readNamesVector(const char file_name[]) cons
     return names;
 }
 
-//retur a vector of textures
+//return a vector of textures
 std::vector<sf::Texture> Resources::getTexturesVector(const std::vector<std::string>& names) const
 {
     std::vector<sf::Texture> textures(names.size());
 
-    for (int i = 0; i < names.size(); i++)
-        textures[i].loadFromFile(names[i]);
+    try
+    {
+        for (int i = 0; i < names.size(); i++)
+        {
+            if (!textures[i].loadFromFile(names[i]))
+            {
+                throw std::runtime_error("Failed to load texture: " + names[i]);
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "input file not found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     return textures;
 }
@@ -363,15 +472,25 @@ std::vector<std::string> Resources::buildMap(const int level)
     std::vector<std::string> map;
     auto time = std::string();
 
-    //opens the file
-    file.open(getLevel(level));
-    if (!file.is_open()) {
-        std::cerr << level << " file not found" << std::endl;
+    //if single or multi
+    if (getSinglePlayerMode())
+    {
+        file.open(getSingleLevel(level));
+    }
+    else
+    {
+        file.open(getMultiLevel(level));
+    }
+    try 
+    {
+        if (!file.is_open()) {
+            throw std::invalid_argument("Invalid Path\n");
+        }
+    }
+    catch (std::invalid_argument error) {
+        std::cerr << error.what();
         exit(EXIT_FAILURE);
     }
-
-    //std::getline(file, time);
-   // m_levelTime = (float)std::stoi(time); //stoi : to convert a string to integer
 
     //reads the map
     for (auto line = std::string(); std::getline(file, line);)
@@ -384,17 +503,101 @@ std::vector<std::string> Resources::buildMap(const int level)
     return map;
 }
 
-//the music of the background
-//void Resources::playMusic()
-//{
-//    m_sounds[background].setLoop(true);// play all the time
-//    m_sounds[background].setVolume(8);
-//    m_sounds[background].play();
-//}
+void Resources::setFriendlyFire(bool f)
+{
+    m_friendlyFire = f;
+}
 
-//play a specific sound
-//void Resources::playSound(const int index)
-//{
-//    m_sounds[index].setVolume(15);
-//    m_sounds[index].play();
-//}
+bool Resources::getFriendlyFire()const
+{
+    return m_friendlyFire;
+}
+
+void Resources::addTakenCoins()
+{
+    m_takenCoins++;
+}
+
+void Resources::addLevelCoins()
+{
+    m_levelCoins++;
+}
+
+void Resources::addCurrentLevel()
+{
+    m_currentLevel++;
+}
+
+int Resources::getCurrentLevel() const
+{
+    return m_currentLevel;
+}
+
+int Resources::getTakenCoins()const
+{
+    return m_takenCoins;
+}
+
+int Resources::getLevelCoins()const
+{
+    return m_levelCoins;
+}
+
+bool Resources::getLevelWon()const
+{
+    return m_levelCoins == m_takenCoins;
+}
+
+bool Resources::getGameFinished()const
+{
+    if(m_singlePlayerMode)
+        return m_currentLevel == m_singlePlayerLevels.size();
+    else
+        return m_currentLevel == m_multiPlayerLevels.size();
+}
+
+void Resources::setSinglePlayerMode(bool b)
+{
+    m_singlePlayerMode = b;
+    if (b)
+        m_numOfPlayers = 1;
+    else
+        m_numOfPlayers = 2;
+}
+
+bool Resources::getSinglePlayerMode()const
+{
+    return m_singlePlayerMode;
+}
+
+void Resources::playerKilled()
+{
+    m_numOfPlayers--;
+}
+
+bool Resources::getLevelLost()const
+{
+    return m_numOfPlayers == 0;
+}
+
+void Resources::resetGame()
+{
+    m_currentLevel = 0;
+    m_takenCoins = 0;
+    m_levelCoins = 0;
+}
+
+void Resources::resetCoins()
+{
+    m_takenCoins = 0;
+    m_levelCoins = 0;
+}
+
+int Resources::getSingleLvlCount() const
+{
+    return m_singlePlayerLevels.size();
+}
+int Resources::getMultipleLvlCount() const
+{
+    return m_multiPlayerLevels.size();
+}

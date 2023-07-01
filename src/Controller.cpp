@@ -1,184 +1,256 @@
 #include "Controller.h"
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include "Board.h"
-#include "Resources.h"
 
 //default Controller constructor:
-Controller::Controller():m_currentLevel(0), m_mainMenu_clickedButton(ClickedButton::Invalid)
+
+Controller::Controller() : m_changeFirstWeapon(false), m_changeSecondWeapon(false),
+m_firstPlayerShoot(false), m_secondPlayerShoot(false), m_isMultiplyer(false), m_isFriendlyOn(false)
 {
+
 	m_window = new sf::RenderWindow(sf::VideoMode(BOARD_WIDTH, BOARD_HEIGHT), "Bad Dolls");
-	m_startMenu.setStartMenu();
-	m_mainMenu.setMainMenu();
+	// Create the main menu
+	m_mainMenu.setWindow(m_window);
+
+	// Add options to the main menu
+	m_mainMenu.add("Start Game", std::make_unique<StartGame>());
+	m_mainMenu.add("Help", std::make_unique<Help>());
+	m_mainMenu.add("Exit", std::make_unique<Exit>());
+
+	m_firstBulletTimer.restart();
+	m_secondBulletTimer.restart();
+}
+//Destructor:
+Controller::~Controller()
+{
+	delete m_window;
+	m_window = nullptr;
 }
 //-------------------------------------------------------------------------------------------
 //function that runs the game from start to end:
 void Controller::run()
 {
+	Resources::instance().playMusic();
 	m_window->setFramerateLimit(60);
-	//display the start menu and store the players name:
-	if (m_startMenu.displayMenu(m_window) == ClickedButton::Login)
-	{
-		//get the first player's name:
-		m_player1Name = m_startMenu.getPlayerName();
-		
-		//check if the player exist, if not create a profile for him:
-		isPlayerExist(m_player1Name);
-	}
-	//display the MainMenu and start if the player clicks start game:
-	if (m_mainMenu.displayMenu(m_window) == ClickedButton::StartGame)
-		startGame();
 
 
+
+	// Display the MainMenu and start if the player clicks start game:
+	startGame();
 }
 //-------------------------------------------------------------------------------------------
 void Controller::startGame()
 {
 	srand(static_cast<unsigned>(time(nullptr)));
 
-	sf::Event event1;
-	sf::Event event2;
-	
-	Board gameBoard(m_window, m_currentLevel);
-	while (m_window->isOpen())
-	{	
-		//clear the window:
-		m_window->clear(sf::Color::Black);
-		//draw the board:
-		gameBoard.draw(*this);
-		//display:
-		m_window->display();
-
-
-		event2.key.code = sf::Keyboard::Space;
-		event1.key.code = sf::Keyboard::H;
-
-		while (m_window->pollEvent(event1))
+	// Outer loop to allow for showing the main menu again if player chooses
+	// to return to main menu after winning or losing a level.
+	while (true)
+	{
+		// Main Menu
+		while (true)
 		{
-			handleEvent(event1, event2, gameBoard);
+			auto choices = m_mainMenu.activate();
+
+			if (choices.first == ClickedButton::Back)
+			{
+				continue; // If 'Back' is chosen, display main menu again
+			}
+
+			if (choices.first == ClickedButton::MultiPlayer)
+			{
+				m_isMultiplyer = true;
+			}
+
+			if (choices.second == ClickedButton::FriendlyFireON)
+			{
+				m_isFriendlyOn = true;
+			}
+
+			break; // Exit the loop if choices.first is not 'Back'
 		}
-		
-		const auto delta = gameClock.restart();
-		//get the new position
-		gameBoard.updatePlayers(delta);
-	
+
+		Resources::instance().setSinglePlayerMode(!m_isMultiplyer);
+		Resources::instance().setFriendlyFire(m_isFriendlyOn);
+
+
+
+		sf::Event event1;
+		sf::Event event2;
+
+		while (!Resources::instance().getGameFinished())
+		{
+			ContactListener listener;
+			Board gameBoard(m_window, Resources::instance().getCurrentLevel(), listener);
+			while (m_window->isOpen() && !Resources::instance().getLevelWon() && !Resources::instance().getLevelLost())
+			{
+				// Clear the window:
+				m_window->clear(sf::Color::Black);
+				// Draw the board:
+				gameBoard.draw(m_window);
+				// Display:
+				m_window->display();
+
+				event2.key.code = sf::Keyboard::Space;
+				event1.key.code = sf::Keyboard::H;
+
+				while (m_window->pollEvent(event1))
+				{
+					handleEvent(event1, event2, gameBoard);
+				}
+
+				const auto delta = gameClock.restart();
+				// Get the new position
+				gameBoard.updateMoving(delta);
+
+				// Update various game elements
+				gameBoard.updateBullets(delta);
+				gameBoard.updateStatics(delta);
+				gameBoard.updateWeapons();
+				gameBoard.updateJumpStatus();
+
+				gameBoard.stepWorld();
+			}
+			// If Level won
+			if (Resources::instance().getLevelWon())
+			{
+				Resources::instance().addCurrentLevel();
+				Resources::instance().resetCoins();
+
+				if (!Resources::instance().getGameFinished())
+				{
+
+					// Winning menu:
+					Resources::instance().playSound(newlvl);
+					auto& winTexture = Resources::instance().getTextures()[win];
+					auto winSprite = sf::Sprite(winTexture);
+					auto WinMenu = Menu(m_window);
+					WinMenu.setSprite(winSprite);
+
+					WinMenu.addWithPos("Next Level", { 0.4 * BOARD_WIDTH, 0.6 * BOARD_HEIGHT }, std::make_unique<Next>());
+					WinMenu.addWithPos("Back To Main Menu", { 0.4 * BOARD_WIDTH, 0.8 * BOARD_HEIGHT }, std::make_unique<Back>());
+
+					auto choice = WinMenu.activate();
+					if (choice.first == ClickedButton::Next)
+					{
+						continue; // Break out of the inner loop to restart the game
+					}
+					else if (choice.first == ClickedButton::Back)
+					{
+						// If 'Back To Main Menu' is chosen, break out of this loop
+						// which will cause the outer loop to show the main menu again.
+						break;
+					}
+				}
+
+			}
+			else if (Resources::instance().getLevelLost()) // If Level lost
+			{
+				Resources::instance().resetCoins();
+				Resources::instance().playSound(levelLost);
+				// losing menu:
+				auto& loseTexture = Resources::instance().getTextures()[lose];
+				auto loseSprite = sf::Sprite(loseTexture);
+				auto loseMenu = Menu(m_window);
+				loseMenu.setSprite(loseSprite);
+
+
+				loseMenu.addWithPos("Back To Main Menu", { 0.39 * BOARD_WIDTH, 0.7 * BOARD_HEIGHT }, std::make_unique<Back>());
+
+				auto choice = loseMenu.activate();
+				if (choice.first == ClickedButton::Back)
+				{
+					// If 'Back To Main Menu' is chosen, break out of this loop
+					// which will cause the outer loop to show the main menu again.
+					break;
+				}
+			}
+		}
+
+		// If all the rounds are won
+		if (Resources::instance().getGameFinished())
+		{
+			Resources::instance().playSound(won);
+			Resources::instance().resetGame();
+			// Winning menu:
+			auto& winTexture = Resources::instance().getTextures()[win];
+			auto winSprite = sf::Sprite(winTexture);
+			auto WinMenu = Menu(m_window);
+			WinMenu.setSprite(winSprite);
+
+			WinMenu.addWithPos("Back To Main Menu", { 0.4 * BOARD_WIDTH, 0.6 * BOARD_HEIGHT }, std::make_unique<Back>());
+			WinMenu.addWithPos("Exit Game", { 0.4 * BOARD_WIDTH, 0.8 * BOARD_HEIGHT }, std::make_unique<Exit>());
+
+			auto choice = WinMenu.activate();
+
+			if (choice.first == ClickedButton::Back)
+			{
+				// If 'Back To Main Menu' is chosen, the outer loop will show the main menu again.
+				continue;
+			}
+			else if (choice.first == ClickedButton::Exit)
+			{
+				// If 'Exit Game' is chosen, exit the function which will ultimately close the game.
+				return;
+			}
+		}
 	}
 }
+
 //-------------------------------------------------------------------------------------------
-//function that returs the window:
-sf::RenderWindow* Controller::getWindow() const
-{
-	return m_window;
-}
-//-------------------------------------------------------------------------------------------
-//function that handle the events of moving the two players:
 void Controller::handleEvent(sf::Event& event1, sf::Event& event2, Board& gameBoard)
 {
 	if (event1.type == sf::Event::Closed || event2.type == sf::Event::Closed)
 	{
 		m_window->close();
+		delete m_window;
+		exit(EXIT_SUCCESS);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	event1.key.code = keyToEvent(sf::Keyboard::Up, sf::Keyboard::Right, sf::Keyboard::Left, sf::Keyboard::Down);
+	event2.key.code = keyToEvent(sf::Keyboard::W, sf::Keyboard::D, sf::Keyboard::A, sf::Keyboard::S);
+
+	m_changeFirstWeapon = sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
+	m_changeSecondWeapon = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+
+	if (m_firstBulletTimer.getElapsedTime().asSeconds() >= 0.2f)
 	{
-		event1.key.code = sf::Keyboard::Up;
+		m_firstPlayerShoot = sf::Keyboard::isKeyPressed(sf::Keyboard::M);
+		m_firstBulletTimer.restart();
+	}
+	if (m_secondBulletTimer.getElapsedTime().asSeconds() >= 0.2f)
+	{
+		m_secondPlayerShoot = sf::Keyboard::isKeyPressed(sf::Keyboard::C);
+		m_secondBulletTimer.restart();
 	}
 
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-	{
-		event1.key.code = sf::Keyboard::Right;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-	{
-		event1.key.code = sf::Keyboard::Left;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-	{
-		event1.key.code = sf::Keyboard::Down;
-	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
-		event2.key.code = sf::Keyboard::W;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		event2.key.code = sf::Keyboard::D;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		event2.key.code = sf::Keyboard::A;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	{
-		event2.key.code = sf::Keyboard::S;
-	}
-
+	gameBoard.changeWeapon(m_changeFirstWeapon, m_changeSecondWeapon);
 	gameBoard.directionPlayers(event1.key.code, event2.key.code);
+	gameBoard.shoot(m_firstPlayerShoot, m_secondPlayerShoot);
+
+	m_changeFirstWeapon = false;
+	m_changeSecondWeapon = false;
+	m_firstPlayerShoot = false;
+	m_secondPlayerShoot = false;
 }
 //-------------------------------------------------------------------------------------------
-//This function gets the players name and check if it exists in 
-// resourses/textFiles/PlayersNames.txt,if the player does not exist it adds the player name 
-//and create default info of him in resourses/textFiles/PlayersDetails.txt
-void Controller::isPlayerExist(std::string playerName)
+sf::Keyboard::Key Controller::keyToEvent(sf::Keyboard::Key keyUp, sf::Keyboard::Key keyRight, sf::Keyboard::Key keyLeft, sf::Keyboard::Key keyDown)
 {
-	//get the names found in the PlayersNames.txt:
-	auto& currentPlayers = Resources::instance().getPlayers();
-	//now check if the given name is the currentPlayers:
-	bool found = false;
-	for (const std::string& player : currentPlayers)
+	if (sf::Keyboard::isKeyPressed(keyUp))
 	{
-		if (player == playerName)
-		{
-			found = true;
-			break;
-		}
+		return sf::Keyboard::Up;
 	}
-	// if the given PlayerName is not found:
-	if (!found)
+	else if (sf::Keyboard::isKeyPressed(keyRight))
 	{
-		//call the function that builds default data of player:
-		createPlayerProfile(playerName);
+		return sf::Keyboard::Right;
 	}
-	else
+	else if (sf::Keyboard::isKeyPressed(keyLeft))
 	{
-		//Nothing needed to be done , player has his own data!!
+		return sf::Keyboard::Left;
+	}
+	else if (sf::Keyboard::isKeyPressed(keyDown))
+	{
+		return sf::Keyboard::Down;
 	}
 
-}
-
-//this function gets playerName that is not found in the recourses
-//and add it's name and a default info about a new player:
-void Controller::createPlayerProfile(std::string playerName)
-{
-	// Add the new player name to the PlayersName.txt file
-	std::ofstream playersNamesFile("..\\..\\..\\resources\\textFiles\\PlayersNames.txt");
-	if (playersNamesFile.is_open())
-	{
-		playersNamesFile << playerName;
-		playersNamesFile.close();
-	}
-	else
-	{
-		// Handle the case where the file couldn't be opened for writing
-		std::cerr << "Error: Unable to open PlayersNames.txt for writing." << std::endl;
-		return; // or throw an exception, depending on your error handling strategy
-	}
-
-	// Create the new player profile to the PlayersDetails.txt file
-	std::ofstream playerDetailsFile("..\\..\\..\\resources\\textFiles\\PlayersDetails.txt");
-	if (playerDetailsFile.is_open())
-	{
-		playerDetailsFile << "Name: " << playerName << "\n" <<
-			"Level: 1\n" << "Score: 0\n" << "Character: Default\n" << "Map: FirstMap\n"
-			<< "Kills: 0\n" << "Coins: 0\n";
-		playerDetailsFile.close();
-	}
-
-	else
-	{
-		// Handle the case where the file couldn't be opened for writing
-		std::cerr << "Error: Unable to open PlayersDetails.txt for writing." << std::endl;
-		return; // or throw an exception, depending on your error handling strategy
-	}
+	return sf::Keyboard::Unknown;
 }

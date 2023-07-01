@@ -1,12 +1,14 @@
 #pragma once
 
 #include "MovingObject.h"
-#include "Character.h"
 #include <memory>
 #include "Animation.h"
 #include "Resources.h"
 #include "io.h"
 #include "Gun.h"
+#include "Weapon.h"
+#include "Bullet.h"
+
 class Player : public MovingObject
 {
 public:
@@ -15,19 +17,42 @@ public:
 	virtual void update(sf::Time) = 0;
 	virtual void direction(sf::Keyboard::Key key) = 0;
 
-	int getCoins();
+	int getCoins()const;
 	void setCoins(int);
 
-	int getPoints();
+	int getPoints()const;
 	void setPoints(int);
 
-	void addGun(Gun gun);
-	Gun getGun(int index);
-	int getGunCount();
-	void changeGunsDirection(sf::Keyboard::Key key);
+	int getKills()const;
+	void setKills(int);
+	void addKills(int);
+
+	void addWeapon(Weapon);
+	Weapon& getWeapon(int index);
+	int getWeaponCount();
+	void changeWeaponDirection(sf::Keyboard::Key key);
+	void clearChosenWeapon();
+
+	void setIsJumping(bool);
+	bool getIsJumping()const;
+
+	void setCanJump(bool);
+	bool getCanJump()const;
+
+	void addBullet(Bullet);
+	Bullet& getBullet(int index);
+	void clearChosenBullet();
+
+	virtual Direction getDirection() = 0;
 
 private:
 	int m_coins;
 	int m_points;
-	std::vector<Gun> m_guns;
+
+	int m_kills;
+	std::vector<Weapon> m_weapons;
+	std::vector<Bullet> m_bullets;
+	bool m_isJumping;
+	bool m_canJump;
+
 };

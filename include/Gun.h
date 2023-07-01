@@ -1,12 +1,8 @@
 #pragma once
-#include "StaticObject.h"
-#include "Gift.h"
 #include <memory>
-
-class Gun : public Gift
+#include "Weapon.h"
+class Gun : public Weapon
 {
-
 public:
 	Gun(const sf::Sprite&);
-
 };

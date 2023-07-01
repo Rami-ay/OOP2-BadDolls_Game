@@ -9,12 +9,12 @@ public:
 	virtual ~MovingObject() = default;
 	virtual void update(sf::Time) = 0;
 	virtual void direction(sf::Keyboard::Key key) = 0;
-	
-	int getHealth();
-    void setHealth(int h) ;
-	void decreaseHealth(int h);
+	virtual void destroyBody() = 0;
+	float getHealth();
+    void setHealth(float h) ;
+	void decreaseHealth(float h);
 	bool isDead();
 private:
 	sf::Vector2f m_prevPosition;
-	int m_health;
+	float m_health;
 };

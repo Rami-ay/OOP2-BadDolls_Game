@@ -2,7 +2,6 @@
 
 
 //includes:
-#include <SFML/Graphics.hpp>
 #include "io.h"
 
 class Button

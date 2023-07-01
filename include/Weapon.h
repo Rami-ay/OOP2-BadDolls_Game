@@ -1,13 +1,21 @@
 #pragma once
+#include "Gift.h"
 
-#include "Item.h"
-
-class Weapon : public Item
+class Weapon : public Gift
 {
-public:
-	Weapon() {};
-	//virtual void initItem(sf::Vector2f position, sf::Sprite spritechar) override;
 private:
+	bool m_chosen;
+	Direction m_weaponDir;
+	std::string m_weaponType;
 
-	sf::Sprite m_sprite;
+public:
+	Weapon(const sf::Sprite&, std::string weaponType);
+	bool getChosen();
+	void setChosen(bool);
+
+	void setWeaponDir(Direction);
+	Direction getWeaponDir();
+
+	std::string getWeaponType();
+
 };

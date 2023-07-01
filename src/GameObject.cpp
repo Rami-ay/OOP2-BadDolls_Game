@@ -1,6 +1,6 @@
 #include "GameObject.h"
 
-GameObject::GameObject(const sf::Sprite& sprite):m_sprite(sprite){}
+GameObject::GameObject(const sf::Sprite& sprite): m_sprite(sprite){}
 //-------------------------------------------------------------------------------------------
 //return the sprite:
 sf::Sprite& GameObject::getSprite() 
@@ -47,4 +47,56 @@ sf::Vector2f GameObject::getPrevPosition() const
 b2Body* GameObject::getB2DBody()
 {
     return m_b2dBody;
+}
+//-------------------------------------------------------------------------------------------
+void GameObject::setLvlSize(sf::Vector2f newLvl)
+{
+    m_boardLvlSize = newLvl;
+}
+//-------------------------------------------------------------------------------------------
+sf::Vector2f GameObject::getLvlSize() const
+{
+    return m_boardLvlSize;
+}
+//-------------------------------------------------------------------------------------------
+//function that sets the sprite origin:
+void GameObject::setSpriteOrigin(sf::Vector2f newOrigin)
+{
+    m_sprite.setOrigin(newOrigin);
+}
+//-------------------------------------------------------------------------------------------
+//function that sets the sprite scale:
+void GameObject::setSpriteScale(sf::Vector2f newScale)
+{
+    m_sprite.setScale(newScale);
+}
+//-------------------------------------------------------------------------------------------
+//function that returns the sprite height:
+float GameObject::getSpriteHeight() const
+{
+    return m_sprite.getGlobalBounds().height;
+}
+//-------------------------------------------------------------------------------------------
+//function that returns the sprite width:
+float GameObject::getSpriteWidth() const
+{
+    return m_sprite.getGlobalBounds().width;
+}
+//-------------------------------------------------------------------------------------------
+//function that moves the sprite:
+void GameObject::moveSprite(sf::Vector2f offset)
+{
+    m_sprite.move(offset);
+}
+//-------------------------------------------------------------------------------------------
+//function that returns the global bounds of the sprite:
+sf::FloatRect GameObject::getSpriteBounds() const
+{
+    return m_sprite.getGlobalBounds();
+}
+//-------------------------------------------------------------------------------------------
+//function that sets the sprite position:
+void GameObject::setSpritePosition(sf::Vector2f newPosition)
+{
+    m_sprite.setPosition(newPosition);
 }

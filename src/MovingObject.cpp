@@ -2,15 +2,16 @@
 #include <iostream>
 
 MovingObject::MovingObject(const sf::Sprite& sprite):GameObject(sprite) {}
-int MovingObject::getHealth()
+
+float MovingObject::getHealth()
 {
     return m_health;
 }
-void MovingObject::setHealth(int h)
+void MovingObject::setHealth(float h)
 {
     m_health = h;
 }
-void MovingObject::decreaseHealth(int h)
+void MovingObject::decreaseHealth(float h)
 {
     m_health -= h;
 }

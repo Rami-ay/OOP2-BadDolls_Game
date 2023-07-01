@@ -1,5 +1,4 @@
 #include "Button.h"
-#include <SFML/Graphics.hpp>
 
 // default empty constructor
 Button::Button() {}

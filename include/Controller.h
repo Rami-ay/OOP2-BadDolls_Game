@@ -1,15 +1,17 @@
 #pragma once
 
-
-// --- includes --- 
 #include <SFML/Graphics.hpp>
-#include "StartMenu.h"
-#include "MainMenu.h"
 #include <utility>
 #include "io.h"
 #include "FirstPlayer.h"
-
-
+#include <iostream>
+#include "Board.h"
+#include "Resources.h"
+#include "Menu.h"
+#include "Command.h"
+#include "StartGame.h"
+#include "Help.h"
+#include "Exit.h"
 class Board;
 
 
@@ -18,32 +20,27 @@ class Controller
 
 public:
     Controller();
-    ~Controller() {};
+    ~Controller();
     void run();
-    sf::RenderWindow* getWindow() const;
     void startGame();
     void handleEvent(sf::Event& event1, sf::Event& event2, Board& gameBoard);
 
 private:
     //window:
     sf::RenderWindow* m_window;
+    Menu m_mainMenu;
+    
     sf::Clock gameClock = sf::Clock();
+    // hon fe t3deel
 
-    //start menu:
-    StartMenu m_startMenu = StartMenu();
-    //Main Menu:
-    MainMenu m_mainMenu = MainMenu();
 
-    //the desired operation in Main Menu:
-    ClickedButton m_mainMenu_clickedButton;
-    //the desired operation in Start Menu:
-    ClickedButton m_startMenu_clickedButton;
+    bool m_isMultiplyer = false;
+    bool m_isFriendlyOn = false;
 
-    //first player's name:
-    std::string m_player1Name;
-    int m_currentLevel;
+    sf::Keyboard::Key keyToEvent(sf::Keyboard::Key keyUp, sf::Keyboard::Key keyRight, sf::Keyboard::Key keyLeft, sf::Keyboard::Key keyDown);
+    bool m_changeFirstWeapon, m_changeSecondWeapon;
+    bool m_firstPlayerShoot, m_secondPlayerShoot;
 
-    //Helping functions:
-    void isPlayerExist(std::string playersName);
-    void createPlayerProfile(std::string playerName);
+    sf::Clock m_firstBulletTimer, m_secondBulletTimer;
+
 };
